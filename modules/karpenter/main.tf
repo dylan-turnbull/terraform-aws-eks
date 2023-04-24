@@ -303,6 +303,12 @@ locals {
   iam_role_name          = coalesce(var.iam_role_name, "Karpenter-${var.cluster_name}")
   iam_role_policy_prefix = "arn:${local.partition}:iam::aws:policy"
   cni_policy             = var.cluster_ip_family == "ipv6" ? "${local.iam_role_policy_prefix}/AmazonEKS_CNI_IPv6_Policy" : "${local.iam_role_policy_prefix}/AmazonEKS_CNI_Policy"
+
+  iam_role_policy_attachments = local.create_iam_role ? toset(compact([
+    "${local.iam_role_policy_prefix}/AmazonEKSWorkerNodePolicy",
+    "${local.iam_role_policy_prefix}/AmazonEC2ContainerRegistryReadOnly",
+    var.iam_role_attach_cni_policy ? local.cni_policy : "",
+  ])) : toset([])
 }
 
 data "aws_iam_policy_document" "assume_role" {
@@ -337,11 +343,7 @@ resource "aws_iam_role" "this" {
 
 # Policies attached ref https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/eks_node_group
 resource "aws_iam_role_policy_attachment" "this" {
-  for_each = { for k, v in toset(compact([
-    "${local.iam_role_policy_prefix}/AmazonEKSWorkerNodePolicy",
-    "${local.iam_role_policy_prefix}/AmazonEC2ContainerRegistryReadOnly",
-    var.iam_role_attach_cni_policy ? local.cni_policy : "",
-  ])) : k => v if local.create_iam_role }
+  for_each = { for k, v in local.iam_role_policy_attachments : k => v if local.create_iam_role }
 
   policy_arn = each.value
   role       = aws_iam_role.this[0].name
