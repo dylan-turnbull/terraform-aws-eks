@@ -80,6 +80,7 @@ data "aws_iam_policy_document" "irsa" {
       "ec2:DescribeInstanceTypeOfferings",
       "ec2:DescribeAvailabilityZones",
       "ec2:DescribeSpotPriceHistory",
+      "ec2:RunInstances",
       "pricing:GetProducts",
     ]
 
