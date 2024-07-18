@@ -81,6 +81,7 @@ data "aws_iam_policy_document" "irsa" {
       "ec2:DescribeAvailabilityZones",
       "ec2:DescribeSpotPriceHistory",
       "ec2:RunInstances",
+      "ec2:TerminateInstances",
       "pricing:GetProducts",
     ]
 
