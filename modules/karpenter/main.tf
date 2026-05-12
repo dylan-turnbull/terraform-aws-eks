@@ -74,6 +74,7 @@ data "aws_iam_policy_document" "irsa" {
       "ec2:DescribeLaunchTemplates",
       "ec2:DescribeImages",
       "ec2:DescribeInstances",
+      "ec2:DescribeInstanceStatus",
       "ec2:DescribeSecurityGroups",
       "ec2:DescribeSubnets",
       "ec2:DescribeInstanceTypes",
@@ -142,6 +143,11 @@ data "aws_iam_policy_document" "irsa" {
   statement {
     actions   = ["iam:PassRole"]
     resources = [var.create_iam_role ? aws_iam_role.this[0].arn : var.iam_role_arn]
+  }
+
+  statement {
+    actions   = ["iam:ListInstanceProfiles"]
+    resources = ["*"]
   }
 
   dynamic "statement" {
